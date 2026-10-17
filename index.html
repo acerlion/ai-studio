@@ -228,6 +228,13 @@ nav button.on svg{transform:translateY(-2px) scale(1.08);stroke:url(#ng)}
       <div><h3>Загрузить селфи</h3><p>Лицо крупно, хороший свет, без очков и масок</p></div>
       <span class="x" onclick="event.stopPropagation();clearPhoto('photo')">✕</span>
     </button>
+    <div id="partner" hidden style="margin-top:10px">
+      <button class="upload" id="up-photo2" onclick="pick('photo2')">
+        <div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></div>
+        <div><h3>Фото партнёра</h3><p>Для парного образа нужно второе селфи</p></div>
+        <span class="x" onclick="event.stopPropagation();clearPhoto('photo2')">✕</span>
+      </button>
+    </div>
     <div class="label">Образ <small id="styleName">не выбран</small></div>
     <div class="chips" id="cats"></div>
     <div class="styles" id="styles"></div>
@@ -333,12 +340,13 @@ const STYLES = [
   {id:"winter", name:"Зимняя сказка", sub:"Снег и огоньки", em:"❄️", cat:"holiday", g:"linear-gradient(160deg,#c9e6ff,#3b5ca8)", f:"saturate(.9) brightness(1.1) hue-rotate(-10deg)", tint:["#d6ecff","#2f4f9c"]},
   {id:"wedding", name:"Свадебный", sub:"Нежно и воздушно", em:"💍", cat:"holiday", g:"linear-gradient(160deg,#fff3e6,#e8b8c8)", f:"brightness(1.12) contrast(.95)", tint:["#fff3e6","#e0a4ba"]},
   {id:"hero", name:"Супергерой", sub:"Постер блокбастера", em:"🦸", cat:"fantasy", g:"linear-gradient(160deg,#ff3b3b,#1a1a5e)", f:"contrast(1.3) saturate(1.3)", tint:["#ff3b3b","#14144a"]},
+  {id:"smith", name:"Мистер и миссис Смит", sub:"Шпионский постер для пары", em:"🕶", cat:"couple", couple:true, g:"linear-gradient(160deg,#8a0f1f,#141414 70%)", hot:"ПАРА", f:"contrast(1.2) saturate(.85)", tint:["#c21f32","#0b0b0b"]},
 ];
-const CATS = [["all","Все"],["portrait","Портрет"],["fashion","Мода"],["fantasy","Фэнтези"],["travel","Путешествия"],["holiday","Праздник"]];
+const CATS = [["all","Все"],["portrait","Портрет"],["fashion","Мода"],["fantasy","Фэнтези"],["travel","Путешествия"],["holiday","Праздник"],["couple","💑 Пары"]];
 const VIDEAS = ["🌊 Волны на закате, дрон-съёмка","🐈 Кот-бариста варит кофе","🚗 Неоновая погоня в дождь","🌸 Сакура, лепестки в slow-mo","🏙 Таймлапс ночного мегаполиса","💃 Танец под светом софитов"];
 const GENRES = [["pop","Поп"],["rap","Рэп"],["rock","Рок"],["lofi","Lo-fi"],["edm","EDM"],["rnb","R&B"],["jazz","Джаз"],["acoustic","Акустика"],["cinematic","Оркестр"]];
 const MOODS = [["happy","😊 Весёлое"],["love","❤️ Романтика"],["sad","🌧 Грустное"],["energy","⚡ Драйв"],["calm","🌙 Спокойное"]];
-const DEFAULT_PRICES = {photo:1, video5:10, video10:20, music:4};
+const DEFAULT_PRICES = {photo:1, photo_couple:2, video5:10, video10:20, music:4};
 const DEFAULT_PACKS = [
   {id:"p20", credits:20, stars:150, title:"Старт", icon:"✨"},
   {id:"p60", credits:60, stars:399, title:"Популярный", icon:"🔥", badge:"−11%"},
@@ -362,7 +370,7 @@ if (tg) {
 
 /* ================= СОСТОЯНИЕ ================= */
 const S = {page:"photo", cat:"all", style:null, count:1, vmode:"text", dur:"5", ar:"9:16", genre:"pop", mood:"happy", voice:"female", lyrics:false,
-  img:{photo:null, video:null}, balance:0, prices:DEFAULT_PRICES, packs:DEFAULT_PACKS, works:[], wfilter:"all", refLink:"", refBonus:5};
+  img:{photo:null, photo2:null, video:null}, balance:0, prices:DEFAULT_PRICES, packs:DEFAULT_PACKS, works:[], wfilter:"all", refLink:"", refBonus:5};
 const $ = id => document.getElementById(id);
 const store = { get(k,d){ try { const v = localStorage.getItem("ais_"+k); return v ? JSON.parse(v) : d } catch(e){ return d } },
                 set(k,v){ try { localStorage.setItem("ais_"+k, JSON.stringify(v)) } catch(e){} } };
@@ -384,11 +392,13 @@ function renderStyles(){
     ${s.hot?`<span class="hot">${s.hot}</span>`:""}<span class="tick">✓</span><span class="em">${s.em}</span><b>${s.name}</b><small>${s.sub}</small></button>`).join("");
 }
 $("styles").onclick = e => { const b=e.target.closest(".style"); if(!b) return; S.style=b.dataset.id; haptic("medium"); renderStyles();
-  $("styleName").textContent = STYLES.find(s=>s.id===S.style).name; updateCta(); };
+  const st=STYLES.find(s=>s.id===S.style); $("styleName").textContent = st.name; $("partner").hidden = !st.couple; updateCta(); };
+const isCouple = () => !!(STYLES.find(s=>s.id===S.style)||{}).couple;
 
 function updateCta(){
   const p=S.prices; let text, cost, ok=true;
-  if (S.page==="photo"){ text="Создать фотосессию"; cost=p.photo*S.count; ok=!!(S.img.photo && S.style); }
+  if (S.page==="photo"){ text = isCouple() ? "Создать фото пары" : "Создать фотосессию";
+    cost = (isCouple() ? (p.photo_couple||2) : p.photo) * S.count; ok=!!(S.img.photo && S.style && (!isCouple() || S.img.photo2)); }
   else if (S.page==="reels"){ text="Создать рилс"; cost=S.dur==="10"?p.video10:p.video5; ok=$("vprompt").value.trim().length>2 && (S.vmode==="text" || !!S.img.video); }
   else if (S.page==="music"){ text="Создать трек"; cost=p.music; ok=$("mprompt").value.trim().length>2 || (S.lyrics && $("mlyrics").value.trim().length>10); }
   $("ctaWrap").style.display = ["photo","reels","music"].includes(S.page) ? "" : "none";
@@ -412,13 +422,14 @@ $("file").onchange = async e => {
   const f=e.target.files[0]; if(!f) return;
   const url = await shrink(f, 1280);
   S.img[pickTarget]=url;
-  const box=$(pickTarget==="photo"?"up-photo":"up-video");
+  const box=$(UPLOAD_BOX[pickTarget][0]);
   box.classList.add("has"); box.querySelector(".ph").innerHTML=`<img src="${url}">`;
   box.querySelector("h3").textContent="Фото загружено ✓"; notify(); updateCta();
 };
-function clearPhoto(t){ S.img[t]=null; const box=$(t==="photo"?"up-photo":"up-video"); box.classList.remove("has");
+const UPLOAD_BOX = {photo:["up-photo","Загрузить селфи"], photo2:["up-photo2","Фото партнёра"], video:["up-video","Фото для анимации"]};
+function clearPhoto(t){ S.img[t]=null; const box=$(UPLOAD_BOX[t][0]); box.classList.remove("has");
   box.querySelector(".ph").innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
-  box.querySelector("h3").textContent = t==="photo"?"Загрузить селфи":"Фото для анимации"; updateCta(); }
+  box.querySelector("h3").textContent = UPLOAD_BOX[t][1]; updateCta(); }
 function shrink(file, max){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>{ const im=new Image(); im.onload=()=>{
   const k=Math.min(1, max/Math.max(im.width,im.height)); const c=document.createElement("canvas"); c.width=im.width*k|0; c.height=im.height*k|0;
   c.getContext("2d").drawImage(im,0,0,c.width,c.height); res(c.toDataURL("image/jpeg",.88)); }; im.onerror=rej; im.src=r.result; }; r.readAsDataURL(file); }); }
@@ -460,7 +471,7 @@ async function generate(){
   const kind = S.page==="photo"?"photo":S.page==="reels"?"video":"music";
   const cost = +$("ctaCost").textContent.split(" ")[0];
   if (cost > S.balance){ notify("warning"); toast("Не хватает кредитов — пополните баланс"); go("balance"); return; }
-  const params = kind==="photo" ? {style:S.style, count:S.count, image:S.img.photo}
+  const params = kind==="photo" ? {style:S.style, count:S.count, image:S.img.photo, image2:isCouple()?S.img.photo2:null}
     : kind==="video" ? {mode:S.vmode, prompt:$("vprompt").value.trim(), duration:S.dur, aspect:S.ar, image:S.vmode==="image"?S.img.video:null}
     : {prompt:$("mprompt").value.trim(), genre:S.genre, mood:S.mood, voice:S.voice, lyrics:S.lyrics?$("mlyrics").value.trim():""};
   haptic("heavy"); showProgress(kind);
@@ -515,7 +526,7 @@ async function poll(id, kind){
 async function makeWork(kind, params, result){
   const w = {id:Date.now()+"", kind, created:Date.now(), title:"", demo:!!result.demo};
   if (kind==="photo"){ const st=STYLES.find(s=>s.id===params.style); w.title=st.name; w.g=st.g;
-    w.urls = result.demo ? await Promise.all(Array.from({length:params.count},(_,i)=>demoPhoto(params.image, st, i))) : result.urls; }
+    w.urls = result.demo ? await Promise.all(Array.from({length:params.count},(_,i)=>demoPhoto(params.image, st, i, false, params.image2))) : result.urls; }
   if (kind==="video"){ w.title=params.prompt.slice(0,40);
     if (result.demo){ w.poster = params.image ? await demoPhoto(params.image, STYLES[3], 0, true) : await demoPoster(params.prompt); }
     else w.urls=result.urls; }
@@ -609,10 +620,16 @@ $("packs").onclick = async e => {
 
 /* ================= ДЕМО-ГЕНЕРАТОРЫ (без сервера) ================= */
 function loadImg(src){ return new Promise(r=>{ const i=new Image(); i.onload=()=>r(i); i.src=src; }); }
-async function demoPhoto(src, st, variant, vertical){
-  const im = await loadImg(src); const W=640, H=vertical?1138:853; const c=document.createElement("canvas"); c.width=W; c.height=H; const x=c.getContext("2d");
-  const k=Math.max(W/im.width,H/im.height)*(1+variant*.12); const dx=(W-im.width*k)/2+(variant%2?-30:30)*variant, dy=(H-im.height*k)/2;
-  x.filter=st.f; x.drawImage(im,dx,dy,im.width*k,im.height*k); x.filter="none";
+async function demoPhoto(src, st, variant, vertical, src2){
+  const W=640, H=vertical?1138:853; const c=document.createElement("canvas"); c.width=W; c.height=H; const x=c.getContext("2d");
+  const srcs = src2 ? [src, src2] : [src], cw = W/srcs.length;   // для пары — два портрета рядом
+  x.filter=st.f;
+  for (const [n, s] of srcs.entries()){
+    const im = await loadImg(s); const k=Math.max(cw/im.width,H/im.height)*(1+variant*.12);
+    const dx=n*cw+(cw-im.width*k)/2+(variant%2?-30:30)*variant, dy=(H-im.height*k)/2;
+    x.save(); x.beginPath(); x.rect(n*cw,0,cw,H); x.clip(); x.drawImage(im,dx,dy,im.width*k,im.height*k); x.restore();
+  }
+  x.filter="none";
   const g=x.createLinearGradient(0,0,W,H); g.addColorStop(0,st.tint[0]); g.addColorStop(1,st.tint[1]);
   x.globalCompositeOperation="soft-light"; x.fillStyle=g; x.fillRect(0,0,W,H);
   x.globalCompositeOperation="source-over"; const v=x.createRadialGradient(W/2,H/2,H*.3,W/2,H/2,H*.75); v.addColorStop(0,"rgba(0,0,0,0)"); v.addColorStop(1,"rgba(0,0,0,.55)"); x.fillStyle=v; x.fillRect(0,0,W,H);
