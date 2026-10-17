@@ -82,6 +82,8 @@ main{padding:4px 16px 0;max-width:560px;margin:0 auto}
 .styles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
 .style{position:relative;aspect-ratio:3/4;border-radius:20px;overflow:hidden;text-align:left;padding:12px;display:flex;flex-direction:column;justify-content:flex-end;color:#fff;isolation:isolate;transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s;border:2px solid transparent}
 .style::before{content:"";position:absolute;inset:0;background:var(--g);z-index:-2}
+.style.ex::before{background:var(--img) center/cover no-repeat,var(--g)}
+.style.ex .em{display:none}
 .style::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.65));z-index:-1}
 .style .em{position:absolute;top:50%;left:50%;transform:translate(-50%,-62%);font-size:54px;filter:drop-shadow(0 8px 18px rgba(0,0,0,.35));transition:transform .4s}
 .style b{font-size:15px;line-height:1.2}
@@ -97,6 +99,7 @@ main{padding:4px 16px 0;max-width:560px;margin:0 auto}
 /* сегменты */
 .seg{display:flex;padding:4px;border-radius:16px;background:var(--card);border:1px solid var(--stroke);position:relative}
 .seg button{flex:1;padding:10px 6px;border-radius:12px;font-weight:700;font-size:14px;color:var(--muted);position:relative;z-index:1;transition:color .25s}
+.seg button small{display:block;font-size:11px;color:var(--ok);font-weight:800;margin-top:1px}
 .seg button.on{color:var(--text);background:var(--card2);box-shadow:0 4px 14px -6px rgba(0,0,0,.4)}
 
 textarea,.input{width:100%;padding:14px 16px;border-radius:18px;background:var(--card);border:1px solid var(--stroke);outline:none;resize:none;line-height:1.45;transition:border-color .2s,box-shadow .2s}
@@ -225,7 +228,7 @@ nav button.on svg{transform:translateY(-2px) scale(1.08);stroke:url(#ng)}
     <div class="hero"><h1>AI-фотосессия <em>за минуту</em></h1><p>Загрузите селфи — нейросеть сделает профессиональные снимки в любом образе.</p></div>
     <button class="upload" id="up-photo" onclick="pick('photo')">
       <div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></div>
-      <div><h3>Загрузить селфи</h3><p>Лицо крупно, хороший свет, без очков и масок</p></div>
+      <div><h3>Загрузить селфи</h3><p>1–3 фото лица крупно, хороший свет, без очков</p></div>
       <span class="x" onclick="event.stopPropagation();clearPhoto('photo')">✕</span>
     </button>
     <div id="partner" hidden style="margin-top:10px">
@@ -239,7 +242,8 @@ nav button.on svg{transform:translateY(-2px) scale(1.08);stroke:url(#ng)}
     <div class="chips" id="cats"></div>
     <div class="styles" id="styles"></div>
     <div class="label">Сколько фото</div>
-    <div class="seg" id="seg-count"><button data-v="1" class="on">1</button><button data-v="2">2</button><button data-v="4">4</button></div>
+    <div class="seg" id="seg-count"><button data-v="1" class="on">1 фото</button><button data-v="5">5 фото<small>−10%</small></button><button data-v="10">10 фото<small>−15%</small></button></div>
+    <p class="note" style="text-align:left;margin-top:8px">В серии 5–10 фото — разные ракурсы и позы, как на настоящей съёмке.</p>
   </section>
 
   <!-- РИЛСЫ -->
@@ -279,12 +283,6 @@ nav button.on svg{transform:translateY(-2px) scale(1.08);stroke:url(#ng)}
     <textarea id="mlyrics" rows="6" maxlength="1500" hidden style="margin-top:10px" placeholder="[Куплет]&#10;...&#10;[Припев]&#10;..."></textarea>
   </section>
 
-  <!-- РАБОТЫ -->
-  <section class="page" id="p-works">
-    <div class="hero"><h1>Мои <em>работы</em></h1><p>Все ваши фото, видео и треки. Нажмите, чтобы открыть, скачать или поделиться.</p></div>
-    <div class="chips" id="wfilter"></div>
-    <div class="gallery" id="gallery"></div>
-  </section>
 
   <!-- БАЛАНС -->
   <section class="page" id="p-balance">
@@ -296,7 +294,7 @@ nav button.on svg{transform:translateY(-2px) scale(1.08);stroke:url(#ng)}
     <div class="ref glass"><h4>🎁 +<span id="refBonus">5</span> ⚡ за каждого друга</h4><p>Друг получит бонус при первом запуске, а вы — кредиты на счёт. Без ограничений.</p><button class="btn2" onclick="shareRef()">📤 Пригласить друга</button></div>
     <div class="label">Вопросы</div>
     <div class="faq">
-      <details><summary>Что такое кредиты ⚡?</summary><p>Внутренняя валюта: 1 фото — 1 ⚡, рилс 5 сек — от 10 ⚡, трек — 4 ⚡. Если генерация не удалась, кредиты возвращаются автоматически.</p></details>
+      <details><summary>Что такое кредиты ⚡?</summary><p>Внутренняя валюта: 1 фото — 2 ⚡, серия из 10 фото — 17 ⚡, рилс 5 сек — от 10 ⚡, трек — 4 ⚡. Если генерация не удалась, кредиты возвращаются автоматически.</p></details>
       <details><summary>Как оплатить?</summary><p>Через Telegram Stars прямо в приложении. Звёзды можно купить в Telegram с карты, через Google Pay или Apple Pay.</p></details>
       <details><summary>Мои фото в безопасности?</summary><p>Селфи используются только для вашей генерации и не публикуются. Готовые работы видите только вы.</p></details>
     </div>
@@ -309,7 +307,6 @@ nav button.on svg{transform:translateY(-2px) scale(1.08);stroke:url(#ng)}
   <button data-p="photo" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Фото</button>
   <button data-p="reels"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M3 8h18M8 3l3 5M14 3l3 5"/><path d="M10.5 12v5l4-2.5z"/></svg>Рилсы</button>
   <button data-p="music"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>Музыка</button>
-  <button data-p="works"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/></svg>Работы</button>
   <button data-p="balance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>Баланс</button>
 </nav>
 
@@ -346,7 +343,7 @@ const CATS = [["all","Все"],["portrait","Портрет"],["fashion","Мод�
 const VIDEAS = ["🌊 Волны на закате, дрон-съёмка","🐈 Кот-бариста варит кофе","🚗 Неоновая погоня в дождь","🌸 Сакура, лепестки в slow-mo","🏙 Таймлапс ночного мегаполиса","💃 Танец под светом софитов"];
 const GENRES = [["pop","Поп"],["rap","Рэп"],["rock","Рок"],["lofi","Lo-fi"],["edm","EDM"],["rnb","R&B"],["jazz","Джаз"],["acoustic","Акустика"],["cinematic","Оркестр"]];
 const MOODS = [["happy","😊 Весёлое"],["love","❤️ Романтика"],["sad","🌧 Грустное"],["energy","⚡ Драйв"],["calm","🌙 Спокойное"]];
-const DEFAULT_PRICES = {photo:1, photo_couple:2, video5:10, video10:20, music:4};
+const DEFAULT_PRICES = {photo:{"1":2, "5":9, "10":17}, video5:10, video10:20, music:4};
 const DEFAULT_PACKS = [
   {id:"p20", credits:20, stars:150, title:"Старт", icon:"✨"},
   {id:"p60", credits:60, stars:399, title:"Популярный", icon:"🔥", badge:"−11%"},
@@ -370,7 +367,7 @@ if (tg) {
 
 /* ================= СОСТОЯНИЕ ================= */
 const S = {page:"photo", cat:"all", style:null, count:1, vmode:"text", dur:"5", ar:"9:16", genre:"pop", mood:"happy", voice:"female", lyrics:false,
-  img:{photo:null, photo2:null, video:null}, balance:0, prices:DEFAULT_PRICES, packs:DEFAULT_PACKS, works:[], wfilter:"all", refLink:"", refBonus:5};
+  img:{photo:null, photo2:null, video:null}, selfies:[], balance:0, prices:DEFAULT_PRICES, packs:DEFAULT_PACKS, works:[], wfilter:"all", refLink:"", refBonus:5};
 const $ = id => document.getElementById(id);
 const store = { get(k,d){ try { const v = localStorage.getItem("ais_"+k); return v ? JSON.parse(v) : d } catch(e){ return d } },
                 set(k,v){ try { localStorage.setItem("ais_"+k, JSON.stringify(v)) } catch(e){} } };
@@ -386,9 +383,13 @@ function seg(el, key, onPick){
   $(el).onclick = e => { const b=e.target.closest("button"); if(!b) return; S[key]=b.dataset.v; haptic();
     [...$(el).children].forEach(x=>x.classList.toggle("on", x===b)); onPick && onPick(); updateCta(); };
 }
+// примеры образов: webapp/examples/<id>.jpg; пока картинка не загрузилась — градиент с эмодзи
+const EXAMPLES = {};
+STYLES.forEach(s => { const im=new Image(); im.onload=()=>{ EXAMPLES[s.id]=true;
+  document.querySelector(`.style[data-id="${s.id}"]`)?.classList.add("ex"); }; im.src=`examples/${s.id}.jpg`; });
 function renderStyles(){
   const list = STYLES.filter(s => S.cat==="all" || s.cat===S.cat);
-  $("styles").innerHTML = list.map((s,i) => `<button class="style${S.style===s.id?" on":""}" data-id="${s.id}" style="--g:${s.g};animation:pop .4s ${i*35}ms both">
+  $("styles").innerHTML = list.map((s,i) => `<button class="style${S.style===s.id?" on":""}${EXAMPLES[s.id]?" ex":""}" data-id="${s.id}" style="--g:${s.g};--img:url(examples/${s.id}.jpg);animation:pop .4s ${i*35}ms both">
     ${s.hot?`<span class="hot">${s.hot}</span>`:""}<span class="tick">✓</span><span class="em">${s.em}</span><b>${s.name}</b><small>${s.sub}</small></button>`).join("");
 }
 $("styles").onclick = e => { const b=e.target.closest(".style"); if(!b) return; S.style=b.dataset.id; haptic("medium"); renderStyles();
@@ -398,7 +399,7 @@ const isCouple = () => !!(STYLES.find(s=>s.id===S.style)||{}).couple;
 function updateCta(){
   const p=S.prices; let text, cost, ok=true;
   if (S.page==="photo"){ text = isCouple() ? "Создать фото пары" : "Создать фотосессию";
-    cost = (isCouple() ? (p.photo_couple||2) : p.photo) * S.count; ok=!!(S.img.photo && S.style && (!isCouple() || S.img.photo2)); }
+    cost = p.photo[S.count]; ok=!!(S.selfies.length && S.style && (!isCouple() || S.img.photo2)); }
   else if (S.page==="reels"){ text="Создать рилс"; cost=S.dur==="10"?p.video10:p.video5; ok=$("vprompt").value.trim().length>2 && (S.vmode==="text" || !!S.img.video); }
   else if (S.page==="music"){ text="Создать трек"; cost=p.music; ok=$("mprompt").value.trim().length>2 || (S.lyrics && $("mlyrics").value.trim().length>10); }
   $("ctaWrap").style.display = ["photo","reels","music"].includes(S.page) ? "" : "none";
@@ -410,24 +411,32 @@ function go(p){
   S.page=p; haptic();
   document.querySelectorAll(".page").forEach(x=>x.classList.toggle("on", x.id==="p-"+p));
   document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on", x.dataset.p===p));
-  if (p==="works") renderWorks();
   window.scrollTo({top:0, behavior:"smooth"}); updateCta();
 }
 document.querySelector("nav").onclick = e => { const b=e.target.closest("button"); if(b) go(b.dataset.p); };
 
 /* ---------- фото ---------- */
 let pickTarget="photo";
-function pick(t){ pickTarget=t; $("file").value=""; $("file").click(); }
+function pick(t){ pickTarget=t; $("file").value=""; $("file").multiple = t==="photo"; $("file").click(); }
 $("file").onchange = async e => {
-  const f=e.target.files[0]; if(!f) return;
-  const url = await shrink(f, 1280);
-  S.img[pickTarget]=url;
+  const files=[...e.target.files]; if(!files.length) return;
   const box=$(UPLOAD_BOX[pickTarget][0]);
-  box.classList.add("has"); box.querySelector(".ph").innerHTML=`<img src="${url}">`;
-  box.querySelector("h3").textContent="Фото загружено ✓"; notify(); updateCta();
+  if (pickTarget==="photo"){   // до 3 селфи: чем больше ракурсов, тем точнее сходство
+    for (const f of files) S.selfies.push(await shrink(f, 1280));
+    S.selfies = S.selfies.slice(-3); S.img.photo = S.selfies[0];
+    box.querySelector(".ph").innerHTML=`<img src="${S.selfies[0]}">`;
+    box.querySelector("h3").textContent = S.selfies.length===1 ? "1 селфи ✓" : `${S.selfies.length} селфи ✓`;
+    box.querySelector("p").textContent = S.selfies.length<3 ? "Добавьте ещё с другого ракурса — сходство будет точнее" : "Отлично, этого хватит для точного сходства";
+  } else {
+    const url = await shrink(files[0], 1280); S.img[pickTarget]=url;
+    box.querySelector(".ph").innerHTML=`<img src="${url}">`; box.querySelector("h3").textContent="Фото загружено ✓";
+  }
+  box.classList.add("has"); notify(); updateCta();
 };
+const UPLOAD_HINT = "1–3 фото лица крупно, хороший свет, без очков";
 const UPLOAD_BOX = {photo:["up-photo","Загрузить селфи"], photo2:["up-photo2","Фото партнёра"], video:["up-video","Фото для анимации"]};
-function clearPhoto(t){ S.img[t]=null; const box=$(UPLOAD_BOX[t][0]); box.classList.remove("has");
+function clearPhoto(t){ S.img[t]=null; if (t==="photo") S.selfies=[]; const box=$(UPLOAD_BOX[t][0]); box.classList.remove("has");
+  if (t==="photo") box.querySelector("p").textContent = UPLOAD_HINT;
   box.querySelector(".ph").innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
   box.querySelector("h3").textContent = UPLOAD_BOX[t][1]; updateCta(); }
 function shrink(file, max){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>{ const im=new Image(); im.onload=()=>{
@@ -449,13 +458,13 @@ async function call(path, body={}){
 async function boot(){
   $("demoBadge").hidden = !DEMO;
   if (DEMO){
-    setBalance(store.get("balance", 30)); S.works=store.get("works", []);
+    setBalance(store.get("balance", 30));
     S.refLink = BOT_USERNAME ? `https://t.me/${BOT_USERNAME}?start=ref_${(tg&&tg.initDataUnsafe.user||{}).id||"demo"}` : location.href;
     renderPacks(); return;
   }
   try {
     const me = await call("/api/me");
-    S.prices=me.prices||S.prices; S.packs=me.packs||S.packs; S.works=(me.works||[]).map(w=>{ const st=STYLES.find(s=>s.id===w.title); return st?{...w,title:st.name}:w; }); S.refLink=me.ref_link||""; S.refBonus=me.ref_bonus||5;
+    S.prices=me.prices||S.prices; S.packs=me.packs||S.packs; S.refLink=me.ref_link||""; S.refBonus=me.ref_bonus||5;
     setBalance(me.balance); $("demoBadge").hidden = !me.demo;
   } catch(e){ toast("⚠️ "+e.message); setBalance(0); }
   renderPacks(); updateCta();
@@ -471,7 +480,7 @@ async function generate(){
   const kind = S.page==="photo"?"photo":S.page==="reels"?"video":"music";
   const cost = +$("ctaCost").textContent.split(" ")[0];
   if (cost > S.balance){ notify("warning"); toast("Не хватает кредитов — пополните баланс"); go("balance"); return; }
-  const params = kind==="photo" ? {style:S.style, count:S.count, image:S.img.photo, image2:isCouple()?S.img.photo2:null}
+  const params = kind==="photo" ? {style:S.style, count:S.count, images:S.selfies, image:S.selfies[0], image2:isCouple()?S.img.photo2:null}
     : kind==="video" ? {mode:S.vmode, prompt:$("vprompt").value.trim(), duration:S.dur, aspect:S.ar, image:S.vmode==="image"?S.img.video:null}
     : {prompt:$("mprompt").value.trim(), genre:S.genre, mood:S.mood, voice:S.voice, lyrics:S.lyrics?$("mlyrics").value.trim():""};
   haptic("heavy"); showProgress(kind);
@@ -486,7 +495,7 @@ async function generate(){
       result = await poll(j.job_id, kind);
     }
     const work = await makeWork(kind, params, result);
-    S.works.unshift(work); if (DEMO) saveDemoWorks();
+    S.works.unshift(work);   // в памяти — для кнопок «Поделиться/Сохранить»; все работы приходят в чат с ботом
     notify(); showResult(work);
   } catch(e){
     notify("error"); closeSheet(); toast("😕 "+e.message);
@@ -536,19 +545,6 @@ async function makeWork(kind, params, result){
     if (!result.demo) w.urls=result.urls; }
   return w;
 }
-function saveDemoWorks(){ store.set("works", S.works.slice(0,30)); }
-function renderWorks(){
-  chips("wfilter", [["all","Все"],["photo","📸 Фото"],["video","🎬 Видео"],["music","🎵 Музыка"]], "wfilter", renderWorks);
-  const list = S.works.filter(w => S.wfilter==="all" || w.kind===S.wfilter);
-  $("gallery").innerHTML = list.length ? list.map((w,i)=>{
-    const d=`style="animation-delay:${i*40}ms"`;
-    if (w.kind==="music") return `<button class="work music" ${d} data-id="${w.id}" style="--g:${w.g};animation-delay:${i*40}ms"><div class="disc"></div><b>${esc(w.title)}</b><small>${w.sub||""}</small></button>`;
-    const src = w.kind==="photo" ? w.urls[0] : (w.poster || "");
-    const media = src ? `<img src="${src}" loading="lazy">` : `<video src="${w.urls[0]}" muted playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover"></video>`;
-    return `<button class="work" ${d} data-id="${w.id}">${media}<span class="tag">${w.kind==="photo"?"📸 "+w.urls.length:"🎬 Видео"}</span><span class="cap">${esc(w.title)}</span></button>`;
-  }).join("") : `<div class="empty" style="grid-column:1/-1"><div class="big">🪄</div><b>Здесь пока пусто</b><p>Создайте первую фотосессию — это займёт минуту.</p><button class="btn2" onclick="go('photo')" style="max-width:240px;margin:14px auto 0">📸 Начать</button></div>`;
-}
-$("gallery").onclick = e => { const b=e.target.closest(".work"); if(b) showResult(S.works.find(w=>w.id===b.dataset.id)); };
 const esc = s => String(s||"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 /* ---------- просмотр результата ---------- */
@@ -602,10 +598,10 @@ function closeSheet(){ if (curAudio) { curAudio.pause(); curAudio=null; } $("she
 /* ================= ТАРИФЫ ================= */
 function renderPacks(){
   const p=S.prices;
-  $("priceList").innerHTML = `<div><b>${p.photo} ⚡</b>1 фото</div><div><b>${p.video5} ⚡</b>рилс 5 сек</div><div><b>${p.music} ⚡</b>трек</div>`;
+  $("priceList").innerHTML = `<div><b>${p.photo["1"]} ⚡</b>1 фото</div><div><b>${p.video5} ⚡</b>рилс 5 сек</div><div><b>${p.music} ⚡</b>трек</div>`;
   $("refBonus").textContent=S.refBonus;
   $("packs").innerHTML = S.packs.map(k=>`<button class="pack${k.sub?" pro":""}" data-id="${k.id}">${k.badge?`<span class="badge">${k.badge}</span>`:""}
-    <span class="ic">${k.icon||"⚡"}</span><span><h4>${k.title}</h4><p>${k.credits} ⚡${k.sub?" каждый месяц · отмена в любой момент":" · ≈ "+Math.floor(k.credits/p.photo)+" фото или "+Math.floor(k.credits/p.music)+" треков"}</p></span>
+    <span class="ic">${k.icon||"⚡"}</span><span><h4>${k.title}</h4><p>${k.credits} ⚡${k.sub?" каждый месяц · отмена в любой момент":" · ≈ "+Math.floor(k.credits/p.photo["10"]*10)+" фото или "+Math.floor(k.credits/p.music)+" треков"}</p></span>
     <span class="price">⭐ ${k.stars}${k.sub?"/мес":""}</span></button>`).join("");
 }
 $("packs").onclick = async e => {
