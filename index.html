@@ -294,7 +294,7 @@ nav button.on svg{transform:translateY(-2px) scale(1.08);stroke:url(#ng)}
     <div class="ref glass"><h4>🎁 +<span id="refBonus">5</span> ⚡ за каждого друга</h4><p>Друг получит бонус при первом запуске, а вы — кредиты на счёт. Без ограничений.</p><button class="btn2" onclick="shareRef()">📤 Пригласить друга</button></div>
     <div class="label">Вопросы</div>
     <div class="faq">
-      <details><summary>Что такое кредиты ⚡?</summary><p>Внутренняя валюта: 1 фото — 2 ⚡, серия из 10 фото — 17 ⚡, рилс 5 сек — от 10 ⚡, трек — 4 ⚡. Если генерация не удалась, кредиты возвращаются автоматически.</p></details>
+      <details><summary>Что такое кредиты ⚡?</summary><p>Внутренняя валюта: <span id="faqPrices">1 фото — 4 ⚡, серия из 10 фото — 34 ⚡, рилс 5 сек — от 10 ⚡, трек — 4 ⚡</span>. Если генерация не удалась, кредиты возвращаются автоматически.</p></details>
       <details><summary>Как оплатить?</summary><p>Через Telegram Stars прямо в приложении. Звёзды можно купить в Telegram с карты, через Google Pay или Apple Pay.</p></details>
       <details><summary>Мои фото в безопасности?</summary><p>Селфи используются только для вашей генерации и не публикуются. Готовые работы видите только вы.</p></details>
     </div>
@@ -343,7 +343,7 @@ const CATS = [["all","Все"],["portrait","Портрет"],["fashion","Мод�
 const VIDEAS = ["🌊 Волны на закате, дрон-съёмка","🐈 Кот-бариста варит кофе","🚗 Неоновая погоня в дождь","🌸 Сакура, лепестки в slow-mo","🏙 Таймлапс ночного мегаполиса","💃 Танец под светом софитов"];
 const GENRES = [["pop","Поп"],["rap","Рэп"],["rock","Рок"],["lofi","Lo-fi"],["edm","EDM"],["rnb","R&B"],["jazz","Джаз"],["acoustic","Акустика"],["cinematic","Оркестр"]];
 const MOODS = [["happy","😊 Весёлое"],["love","❤️ Романтика"],["sad","🌧 Грустное"],["energy","⚡ Драйв"],["calm","🌙 Спокойное"]];
-const DEFAULT_PRICES = {photo:{"1":2, "5":9, "10":17}, video5:10, video10:20, music:4};
+const DEFAULT_PRICES = {photo:{"1":4, "5":18, "10":34}, video5:10, video10:20, music:4};
 const DEFAULT_PACKS = [
   {id:"p20", credits:20, stars:150, title:"Старт", icon:"✨"},
   {id:"p60", credits:60, stars:399, title:"Популярный", icon:"🔥", badge:"−11%"},
@@ -422,13 +422,13 @@ $("file").onchange = async e => {
   const files=[...e.target.files]; if(!files.length) return;
   const box=$(UPLOAD_BOX[pickTarget][0]);
   if (pickTarget==="photo"){   // до 3 селфи: чем больше ракурсов, тем точнее сходство
-    for (const f of files) S.selfies.push(await shrink(f, 1280));
+    for (const f of files) S.selfies.push(await shrink(f, 1600, .93));   // крупнее и чище — точнее черты лица
     S.selfies = S.selfies.slice(-3); S.img.photo = S.selfies[0];
     box.querySelector(".ph").innerHTML=`<img src="${S.selfies[0]}">`;
     box.querySelector("h3").textContent = S.selfies.length===1 ? "1 селфи ✓" : `${S.selfies.length} селфи ✓`;
     box.querySelector("p").textContent = S.selfies.length<3 ? "Добавьте ещё с другого ракурса — сходство будет точнее" : "Отлично, этого хватит для точного сходства";
   } else {
-    const url = await shrink(files[0], 1280); S.img[pickTarget]=url;
+    const url = await shrink(files[0], pickTarget==="photo2" ? 1600 : 1280, pickTarget==="photo2" ? .93 : .88); S.img[pickTarget]=url;
     box.querySelector(".ph").innerHTML=`<img src="${url}">`; box.querySelector("h3").textContent="Фото загружено ✓";
   }
   box.classList.add("has"); notify(); updateCta();
@@ -439,9 +439,9 @@ function clearPhoto(t){ S.img[t]=null; if (t==="photo") S.selfies=[]; const box=
   if (t==="photo") box.querySelector("p").textContent = UPLOAD_HINT;
   box.querySelector(".ph").innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>';
   box.querySelector("h3").textContent = UPLOAD_BOX[t][1]; updateCta(); }
-function shrink(file, max){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>{ const im=new Image(); im.onload=()=>{
+function shrink(file, max, quality=.88){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>{ const im=new Image(); im.onload=()=>{
   const k=Math.min(1, max/Math.max(im.width,im.height)); const c=document.createElement("canvas"); c.width=im.width*k|0; c.height=im.height*k|0;
-  c.getContext("2d").drawImage(im,0,0,c.width,c.height); res(c.toDataURL("image/jpeg",.88)); }; im.onerror=rej; im.src=r.result; }; r.readAsDataURL(file); }); }
+  c.getContext("2d").drawImage(im,0,0,c.width,c.height); res(c.toDataURL("image/jpeg",quality)); }; im.onerror=rej; im.src=r.result; }; r.readAsDataURL(file); }); }
 
 /* ---------- рилсы / музыка ---------- */
 function toggleLyrics(){ S.lyrics=!S.lyrics; haptic(); $("t-lyrics").classList.toggle("on",S.lyrics); $("mlyrics").hidden=!S.lyrics; updateCta(); }
@@ -600,6 +600,7 @@ function renderPacks(){
   const p=S.prices;
   $("priceList").innerHTML = `<div><b>${p.photo["1"]} ⚡</b>1 фото</div><div><b>${p.video5} ⚡</b>рилс 5 сек</div><div><b>${p.music} ⚡</b>трек</div>`;
   $("refBonus").textContent=S.refBonus;
+  $("faqPrices").textContent = `1 фото — ${p.photo["1"]} ⚡, серия из 10 фото — ${p.photo["10"]} ⚡, рилс 5 сек — от ${p.video5} ⚡, трек — ${p.music} ⚡`;
   $("packs").innerHTML = S.packs.map(k=>`<button class="pack${k.sub?" pro":""}" data-id="${k.id}">${k.badge?`<span class="badge">${k.badge}</span>`:""}
     <span class="ic">${k.icon||"⚡"}</span><span><h4>${k.title}</h4><p>${k.credits} ⚡${k.sub?" каждый месяц · отмена в любой момент":" · ≈ "+Math.floor(k.credits/p.photo["10"]*10)+" фото или "+Math.floor(k.credits/p.music)+" треков"}</p></span>
     <span class="price">⭐ ${k.stars}${k.sub?"/мес":""}</span></button>`).join("");
