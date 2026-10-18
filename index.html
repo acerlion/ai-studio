@@ -242,7 +242,7 @@ nav button.on svg{transform:translateY(-2px) scale(1.08);stroke:url(#ng)}
     <div class="chips" id="cats"></div>
     <div class="styles" id="styles"></div>
     <div class="label">Сколько фото</div>
-    <div class="seg" id="seg-count"><button data-v="1" class="on">1 фото</button><button data-v="5">5 фото<small>−13%</small></button><button data-v="10">10 фото<small>−20%</small></button></div>
+    <div class="seg" id="seg-count"><button data-v="1" class="on">1 фото</button><button data-v="5">5 фото<small>−11%</small></button><button data-v="10">10 фото<small>−20%</small></button></div>
     <p class="note" style="text-align:left;margin-top:8px">В серии 5–10 фото — разные ракурсы и позы, как на настоящей съёмке.</p>
   </section>
 
@@ -291,10 +291,10 @@ nav button.on svg{transform:translateY(-2px) scale(1.08);stroke:url(#ng)}
     <div class="label">Пополнить баланс</div>
     <div class="packs" id="packs"></div>
     <div class="label">Пригласите друзей</div>
-    <div class="ref glass"><h4>🎁 +<span id="refBonus">15</span> ⭐ за каждого друга</h4><p>Друг получит бонус при первом запуске, а вы — звёзды на баланс. Без ограничений.</p><button class="btn2" onclick="shareRef()">📤 Пригласить друга</button></div>
+    <div class="ref glass"><h4>🎁 +<span id="refBonus">45</span> ⭐ за каждого друга</h4><p>Друг получит бонус при первом запуске, а вы — звёзды на баланс. Без ограничений.</p><button class="btn2" onclick="shareRef()">📤 Пригласить друга</button></div>
     <div class="label">Вопросы</div>
     <div class="faq">
-      <details><summary>Сколько это стоит?</summary><p>Баланс пополняется Telegram Stars ⭐ и тратится на генерации: <span id="faqPrices">1 фото — 15 ⭐, серия из 10 фото — 120 ⭐, рилс 5 сек — от 60 ⭐, трек — 25 ⭐</span>. Если генерация не удалась, звёзды возвращаются на баланс автоматически.</p></details>
+      <details><summary>Сколько это стоит?</summary><p>Баланс пополняется Telegram Stars ⭐ и тратится на генерации: <span id="faqPrices">1 фото — 45 ⭐, серия из 10 фото — 360 ⭐, рилс 5 сек — от 60 ⭐, трек — 25 ⭐</span>. Если генерация не удалась, звёзды возвращаются на баланс автоматически.</p></details>
       <details><summary>Как оплатить?</summary><p>Через Telegram Stars прямо в приложении. Звёзды можно купить в Telegram с карты, через Google Pay или Apple Pay.</p></details>
       <details><summary>Мои фото в безопасности?</summary><p>Селфи используются только для вашей генерации и не публикуются. Готовые работы видите только вы.</p></details>
     </div>
@@ -343,7 +343,7 @@ const CATS = [["all","Все"],["portrait","Портрет"],["fashion","Мод�
 const VIDEAS = ["🌊 Волны на закате, дрон-съёмка","🐈 Кот-бариста варит кофе","🚗 Неоновая погоня в дождь","🌸 Сакура, лепестки в slow-mo","🏙 Таймлапс ночного мегаполиса","💃 Танец под светом софитов"];
 const GENRES = [["pop","Поп"],["rap","Рэп"],["rock","Рок"],["lofi","Lo-fi"],["edm","EDM"],["rnb","R&B"],["jazz","Джаз"],["acoustic","Акустика"],["cinematic","Оркестр"]];
 const MOODS = [["happy","😊 Весёлое"],["love","❤️ Романтика"],["sad","🌧 Грустное"],["energy","⚡ Драйв"],["calm","🌙 Спокойное"]];
-const DEFAULT_PRICES = {photo:{"1":15, "5":65, "10":120}, video5:60, video10:110, music:25};
+const DEFAULT_PRICES = {photo:{"1":45, "5":200, "10":360}, video5:60, video10:110, music:25};
 const DEFAULT_PACKS = [
   {id:"s100", credits:100, stars:100, title:"100 звёзд", icon:"✨"},
   {id:"s250", credits:275, stars:250, title:"250 звёзд", icon:"🔥", badge:"+10%"},
